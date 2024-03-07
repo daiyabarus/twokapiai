@@ -33,3 +33,23 @@ def gsmrawkpiIndex():
         "TCH_Drop_Reason_Excessive_TA": 30,
         "TCH_Drop_Reason_Other": 31,
     }
+
+
+def baseline():
+    return [
+        ("Availability", "99.9"),
+        ("Call_Setup_Success_Rate", "98.8"),
+        ("HO_Success_Rate", "96.6"),
+        ("HO_UTRAN_Success_Rate", "96.6"),
+        ("Voice_Traffic", "SUFFIX"),
+        ("Traffic_Mb", "SUFFIX"),
+        ("DL_EGRPS_Throughput", "SUFFIX"),
+        ("UL_EGRPS_Throughput", "SUFFIX"),
+        ("HO_attempts", "SUFFIX"),
+        ("HO_Utran_Attempts", "SUFFIX"),
+        ("Random_Access_Success_Rate", "98.8"),
+        ("Interference_UL_ICM_Band4_Band5", "0.107"),
+        ("SDCCH_Drop_Rate", "0.775"),
+        ("Call_Drop_Rate", "1.8"),
+        ("TbfDrop_Rate", "0.513"),
+    ]

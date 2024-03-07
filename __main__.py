@@ -3,7 +3,10 @@ from process.bhprocessmin import PrePostProcdrop
 
 from utils.toget import ToGet
 from datetime import datetime
-from enumlist import gsmrawkpiIndex
+
+# from enumlist import gsmrawkpiIndex
+# from enumlist import baseline
+import enumlist
 import time
 import os
 import sys
@@ -55,9 +58,10 @@ def main():
         prepostcompare = PrePostProc(
             cell_data=cell_data,
             rawkpi_data=raw_data_csv,
-            rawkpi_col=gsmrawkpiIndex(),
+            rawkpi_col=enumlist.gsmrawkpiIndex(),
             date_data=date_data,
             busyhour_data=bh_data,
+            baseline_data=enumlist.baseline(),
             mockpi=mockpi,
         )
 
@@ -68,9 +72,10 @@ def main():
         prepostcomparedrop = PrePostProcdrop(
             cell_data=cell_data,
             rawkpi_data=raw_data_csv,
-            rawkpi_col=gsmrawkpiIndex(),
+            rawkpi_col=enumlist.gsmrawkpiIndex(),
             date_data=date_data,
             busyhour_data=bh_data,
+            baseline_data=enumlist.baseline(),
             mockpi=mockpi,
         )
 

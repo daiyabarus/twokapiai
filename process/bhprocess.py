@@ -4,13 +4,21 @@ from datetime import datetime
 
 class PrePostProc:
     def __init__(
-        self, cell_data, rawkpi_data, rawkpi_col, date_data, busyhour_data, mockpi
+        self,
+        cell_data,
+        rawkpi_data,
+        rawkpi_col,
+        date_data,
+        busyhour_data,
+        baseline_data,
+        mockpi,
     ):
         self.cell_data = cell_data
         self.rawkpi_data = rawkpi_data
         self.rawkpi_col = rawkpi_col
         self.date_data = date_data
         self.busyhour_data = busyhour_data
+        self.baseline_data = baseline_data
         self.mockpi = mockpi
 
     def _parse_date(self, date_str):
@@ -54,8 +62,9 @@ class PrePostProc:
 
     def process_kpi(self):
         pre_values, post_values = self._extract_kpi_values()
-
         kpi_result = []
+        baseline_dict = dict(self.baseline_data)
+
         for cell in self.cell_data:
             pre_avg = (
                 round(sum(pre_values[cell]) / len(pre_values[cell]), 2)
@@ -70,6 +79,17 @@ class PrePostProc:
 
             prepost_calc = Aggr(pre_avg, post_avg)
             bsc = self._get_bsc(self.rawkpi_data[1])
+
+            flag_to_use = "flag"
+            if baseline_dict.get(self.mockpi) == "SUFFIX":
+                baseline_value = post_avg
+                baseline_calc = Aggr(pre_avg, post_avg)
+                flag_to_use = "flag10"
+            else:
+                baseline_value = float(baseline_dict.get(self.mockpi, 0))
+                baseline_calc = Aggr(post_avg, baseline_value)
+                flag_to_use = "flagdrop10"
+
             kpi_data = [
                 bsc,
                 cell,
@@ -79,7 +99,11 @@ class PrePostProc:
                 prepost_calc.delta,
                 prepost_calc.delta_percent,
                 prepost_calc.flag,
+                baseline_calc.delta,
+                baseline_calc.delta_percent,
+                getattr(baseline_calc, flag_to_use),
             ]
             kpi_result.append(kpi_data)
 
         return kpi_result
+
