@@ -23,3 +23,28 @@ class Flag:
             "Call_Drop_Rate",
             "TbfDrop_Rate",
         ]
+
+    @staticmethod
+    def mockpi_agg_list():
+        return [
+            "Availability",
+            "Call_Setup_Success_Rate",
+            "HO_Success_Rate",
+            "HO_UTRAN_Success_Rate",
+            "DL_EGRPS_Throughput",
+            "UL_EGRPS_Throughput",
+            "Random_Access_Success_Rate",
+            "Interference_UL_ICM_Band4_Band5",
+            "SDCCH_Drop_Rate",
+            "Call_Drop_Rate",
+            "TbfDrop_Rate",
+        ]
+
+    @staticmethod
+    def mockpi_sum_list():
+        return [
+            "HO_attempts",
+            "HO_Utran_Attempts",
+            "Voice_Traffic",
+            "Traffic_Mb",
+        ]

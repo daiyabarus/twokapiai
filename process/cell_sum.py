@@ -1,6 +1,6 @@
 from utils.diff import Diff
 from datetime import datetime, timedelta
-from enumflag import Flag
+# from enumflag import Flag
 
 
 class SUMPrePost:
@@ -88,9 +88,9 @@ class SUMPrePost:
 
         pre_date = self._parse_date(self.date_data[0][0])
         post_date = self._parse_date(self.date_data[0][1])
-        inc_kpis = Flag.flag5_inc()
-        dcr_kpis = Flag.flag5_dcr()
-
+        # inc_kpis = Flag.flag5_inc()
+        # dcr_kpis = Flag.flag5_dcr()
+        #
         pre_sum_oneday = self._sum_kpi_values_for_dates(pre_values, pre_date, pre_date)
 
         post_sum_oneday = self._sum_kpi_values_for_dates(

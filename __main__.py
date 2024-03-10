@@ -3,11 +3,12 @@ from process.cell_sum import SUMPrePost
 
 from utils.toget import ToGet
 from datetime import datetime
+from enumflag import Flag
 
 import enumlist
+
 import time
 import os
-# import sys
 
 
 def main():
@@ -26,9 +27,7 @@ def main():
     kpi_process_result = []
     hourly_raw = [os.path.join(source_kpi, filename) for filename in kpihourly]
     daily_raw = [os.path.join(source_kpi, filename) for filename in kpidaily]
-    print(f"{hourly_raw}")
-    print(f"{daily_raw}")
-    print(f"{kpihourly}")
+
     bh_txt = os.path.join(source_folder, "busyhour_data.csv")
     cell_txt = os.path.join(source_folder, "cell_data.csv")
     date_csv = os.path.join(source_folder, "date_data.csv")
@@ -39,26 +38,8 @@ def main():
     rawhourly_data = ToGet.csv_files_to_list(csv_files=hourly_raw, delimiter=",")
     rawdaily_data = ToGet.csv_files_to_list(csv_files=daily_raw, delimiter=",")
 
-    mockpi_agg_list = [
-        "Availability",
-        "Call_Setup_Success_Rate",
-        "HO_Success_Rate",
-        "HO_UTRAN_Success_Rate",
-        "DL_EGRPS_Throughput",
-        "UL_EGRPS_Throughput",
-        "Random_Access_Success_Rate",
-        "Interference_UL_ICM_Band4_Band5",
-        "SDCCH_Drop_Rate",
-        "Call_Drop_Rate",
-        "TbfDrop_Rate",
-    ]
-
-    mockpi_sum_list = [
-        "HO_attempts",
-        "HO_Utran_Attempts",
-        "Voice_Traffic",
-        "Traffic_Mb",
-    ]
+    mockpi_agg_list = Flag.mockpi_agg_list()
+    mockpi_sum_list = Flag.mockpi_sum_list()
 
     for mockpi in mockpi_agg_list:
         aggprepost_compare = AGGPrePost(
