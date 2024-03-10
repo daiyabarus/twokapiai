@@ -1,5 +1,6 @@
 from utils.diff import Diff
 from datetime import datetime, timedelta
+from enumflag import Flag
 
 
 class SUMPrePost:
@@ -87,6 +88,8 @@ class SUMPrePost:
 
         pre_date = self._parse_date(self.date_data[0][0])
         post_date = self._parse_date(self.date_data[0][1])
+        inc_kpis = Flag.flag5_inc()
+        dcr_kpis = Flag.flag5_dcr()
 
         pre_sum_oneday = self._sum_kpi_values_for_dates(pre_values, pre_date, pre_date)
 
@@ -120,11 +123,15 @@ class SUMPrePost:
             oneweek_calc = Diff(pre_sum_oneweek[cell], post_sum_oneweek[cell])
 
             if baseline_dict.get(self.mockpi) == "SUFFIX":
-                baseline_value = post_sum_oneweek
-                baseline_calc = Diff(pre_sum_oneweek[cell], post_sum_oneweek[cell])
+                post_baseline = post_sum_oneweek[cell]
+                pre_baseline = pre_sum_oneweek[cell]
+                baseline_calc = Diff(pre_baseline, post_baseline)
+                baseline_flag = baseline_calc.threshold_flag_dec
             else:
-                baseline_value = float(baseline_dict.get(self.mockpi, 0))
-                baseline_calc = Diff(post_sum_oneweek[cell], baseline_value)
+                pre_baseline = post_sum_oneweek[cell]
+                post_baseline = float(baseline_dict.get(self.mockpi, 0))
+                baseline_calc = Diff(pre_baseline, post_baseline)
+                baseline_flag = baseline_calc.threshold_flag_inc
 
             kpi_data = [
                 bsc,
@@ -134,23 +141,25 @@ class SUMPrePost:
                 post_sum,
                 prepost_calc.delta,
                 prepost_calc.delta_percent,
-                prepost_calc.flag,
+                prepost_calc.flag5_inc,
                 pre_sum_oneday[cell],
                 post_sum_oneday[cell],
                 one_day_calc.delta,
                 one_day_calc.delta_percent,
-                one_day_calc.flag,
+                one_day_calc.flag5_inc,
                 pre_sum_twodays[cell],
                 post_sum_twodays[cell],
                 twodays_calc.delta,
                 twodays_calc.delta_percent,
-                twodays_calc.flag,
+                twodays_calc.flag5_inc,
                 pre_sum_oneweek[cell],
                 post_sum_oneweek[cell],
                 oneweek_calc.delta,
                 oneweek_calc.delta_percent,
-                oneweek_calc.flag,
-                baseline_calc.threshold_flag_inc,
+                oneweek_calc.flag5_inc,
+                pre_baseline,
+                post_baseline,
+                baseline_flag,
             ]
             kpi_result.append(kpi_data)
 

@@ -1,5 +1,6 @@
 from utils.diff import Diff
 from datetime import datetime, timedelta
+from enumflag import Flag
 
 
 class AGGPrePost:
@@ -88,6 +89,8 @@ class AGGPrePost:
         baseline_dict = dict(self.baseline_data)
         pre_date = self._parse_date(self.date_data[0][0])
         post_date = self._parse_date(self.date_data[0][1])
+        inc_kpis = Flag.flag5_inc()
+        dcr_kpis = Flag.flag5_dcr()
 
         pre_values, post_values = self._extract_kpi_values(False)
 
@@ -125,19 +128,54 @@ class AGGPrePost:
                 else 0
             )
 
-            prepost_calc = Diff(pre_avg, post_avg)
+            if self.mockpi in inc_kpis:
+                flag_type = "inc"
+            elif self.mockpi in dcr_kpis:
+                flag_type = "dcr"
+            else:
+                flag_type = "unknown"
+
             bsc = self._get_bsc(cell)
+            prepost_calc = Diff(pre_avg, post_avg)
+
+            flag_result_prepost = (
+                prepost_calc.flag5_inc if flag_type == "inc" else prepost_calc.flag5_dcr
+            )
 
             one_day_calc = Diff(pre_avg_oneday[cell], post_avg_oneday[cell])
+
+            flag_result_one_day = (
+                one_day_calc.flag5_inc if flag_type == "inc" else one_day_calc.flag5_dcr
+            )
+
             twodays_calc = Diff(pre_avg_twodays[cell], post_avg_twodays[cell])
+
+            flag_result_two_days = (
+                twodays_calc.flag5_inc if flag_type == "inc" else twodays_calc.flag5_dcr
+            )
+
             oneweek_calc = Diff(pre_avg_oneweek[cell], post_avg_oneweek[cell])
+            flag_result_one_week = (
+                oneweek_calc.flag5_inc if flag_type == "inc" else oneweek_calc.flag5_dcr
+            )
 
             if baseline_dict.get(self.mockpi) == "SUFFIX":
-                baseline_value = post_avg_oneweek
-                baseline_calc = Diff(pre_avg_oneweek[cell], post_avg_oneweek[cell])
+                post_baseline = post_avg_oneweek[cell]
+                pre_baseline = pre_avg_oneweek[cell]
+                baseline_calc = Diff(pre_baseline, post_baseline)
+                baseline_flag = baseline_calc.threshold_flag_dec
+
+            elif self.mockpi in dcr_kpis:
+                pre_baseline = post_avg_oneweek[cell]
+                post_baseline = float(baseline_dict.get(self.mockpi, 0))
+                baseline_calc = Diff(pre_baseline, post_baseline)
+                baseline_flag = baseline_calc.threshold_flag_dec
+
             else:
-                baseline_value = float(baseline_dict.get(self.mockpi, 0))
-                baseline_calc = Diff(post_avg_oneweek[cell], baseline_value)
+                pre_baseline = post_avg_oneweek[cell]
+                post_baseline = float(baseline_dict.get(self.mockpi, 0))
+                baseline_calc = Diff(pre_baseline, post_baseline)
+                baseline_flag = baseline_calc.threshold_flag_inc
 
             kpi_data = [
                 bsc,
@@ -146,24 +184,26 @@ class AGGPrePost:
                 pre_avg,
                 post_avg,
                 prepost_calc.delta,
-                f"{prepost_calc.delta_percent}%",
-                prepost_calc.flag,
+                prepost_calc.delta_percent,
+                flag_result_prepost,
                 pre_avg_oneday[cell],
                 post_avg_oneday[cell],
                 one_day_calc.delta,
-                f"{one_day_calc.delta_percent}%",
-                one_day_calc.flag,
+                one_day_calc.delta_percent,
+                flag_result_one_day,
                 pre_avg_twodays[cell],
                 post_avg_twodays[cell],
                 twodays_calc.delta,
                 twodays_calc.delta_percent,
-                twodays_calc.flag,
+                flag_result_two_days,
                 pre_avg_oneweek[cell],
                 post_avg_oneweek[cell],
                 oneweek_calc.delta,
                 oneweek_calc.delta_percent,
-                oneweek_calc.flag,
-                baseline_calc.threshold_flag_inc,
+                flag_result_one_week,
+                pre_baseline,
+                post_baseline,
+                baseline_flag,
             ]
             kpi_result.append(kpi_data)
 
