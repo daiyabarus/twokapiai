@@ -8,9 +8,13 @@ from openpyxl.styles import Alignment
 from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
 
-redFill = PatternFill(start_color="FFFFC7CE", end_color="FFFFC7CE", fill_type="solid")
+redFill = PatternFill(
+    start_color="FFFFC7CE", end_color="FFFFC7CE", fill_type="solid"
+)
 darkRedText = Font(color="FF9C0006")
-greenFill = PatternFill(start_color="FFC6EFCE", end_color="FFC6EFCE", fill_type="solid")
+greenFill = PatternFill(
+    start_color="FFC6EFCE", end_color="FFC6EFCE", fill_type="solid"
+)
 darkGreenText = Font(color="FF006100")
 
 headerFill = PatternFill("solid", fgColor="47402D")
@@ -152,17 +156,25 @@ class PrintToFile:
 
         for row_index, items in enumerate(unique_contents, start=2):
             for col_index, item in enumerate(items, start=1):
-                cell = ws_target.cell(row=row_index, column=col_index, value=item)
-                if list_of_red and any(ext in str(item) for ext in list_of_red):
+                cell = ws_target.cell(
+                    row=row_index, column=col_index, value=item
+                )
+                if list_of_red and any(
+                    ext in str(item) for ext in list_of_red
+                ):
                     cell.fill = redFill
                     cell.font = Font(name="Calibri", size=10, color="FF9C0006")
-                elif list_of_green and any(ext in str(item) for ext in list_of_green):
+                elif list_of_green and any(
+                    ext in str(item) for ext in list_of_green
+                ):
                     cell.fill = greenFill
                     cell.font = Font(name="Calibri", size=10, color="FF006100")
                 else:
                     cell.font = Font(name="Calibri", size=10)
                 cell.border = thin_border
-        ws_target.auto_filter.ref = f"A1:{get_column_letter(len(list_of_header))}1"
+        ws_target.auto_filter.ref = (
+            f"A1:{get_column_letter(len(list_of_header))}1"
+        )
         wb.save(file_to_save)
 
         return os.path.exists(file_to_save)
@@ -267,7 +279,9 @@ class PrintToFile:
 
                     ws_target.cell(
                         row=starting_row, column=col + 1 + col_offside
-                    ).alignment = Alignment(horizontal="center", vertical="center")
+                    ).alignment = Alignment(
+                        horizontal="center", vertical="center"
+                    )
 
                     ws_target.cell(
                         row=starting_row, column=col + 1 + col_offside

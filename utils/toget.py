@@ -99,6 +99,21 @@ class ToGet:
         return folders
 
     @staticmethod
+    def get_listfile_with_prefix(folderpath: str, prefix: str):
+        """Get list of files in a directory with a specified prefix."""
+        items = os.listdir(folderpath)
+
+        files = []
+        for item in items:
+            if item.startswith(prefix):
+                item_abspath = os.path.join(folderpath, item)
+                if os.path.isfile(
+                    item_abspath
+                ):  # Fix here: Check if it's a file instead of a directory
+                    files.append(item)
+        return files
+
+    @staticmethod
     def delete_file(filepath: str):
         """Delete a file"""
         try:
@@ -150,6 +165,18 @@ class ToGet:
                     list_of_mos.append(row)
 
         return list_of_mos
+
+    @staticmethod
+    def csv_files_to_list(csv_files: list, delimiter: str = ";") -> list:
+        """Get list from CSV files with custom delimiter"""
+        list_of_lists = []
+        for csv_file in csv_files:
+            with open(csv_file, newline="") as f:
+                file_reader = csv.reader(f, delimiter=delimiter)
+                for row in file_reader:
+                    if len(row) > 0:
+                        list_of_lists.append(row)
+        return list_of_lists
 
     @staticmethod
     def dict_to_json(dt_info: dict, path_to_save: str):

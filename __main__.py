@@ -15,7 +15,8 @@ import sys
 def main():
     startTime = time.time()
     print(
-        "StartTime: ", datetime.fromtimestamp(startTime).strftime("%Y-%m-%d %H:%M:%S")
+        "StartTime: ",
+        datetime.fromtimestamp(startTime).strftime("%Y-%m-%d %H:%M:%S"),
     )
 
     project_dir = os.path.dirname(os.path.abspath(__file__))
@@ -84,7 +85,10 @@ def main():
 
     print(kpi_process_result)
     endTime = time.time()
-    print("endTime: ", datetime.fromtimestamp(endTime).strftime("%Y-%m-%d %H:%M:%S"))
+    print(
+        "endTime: ",
+        datetime.fromtimestamp(endTime).strftime("%Y-%m-%d %H:%M:%S"),
+    )
 
     elapsedTime = endTime - startTime
 

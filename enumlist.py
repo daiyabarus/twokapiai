@@ -35,6 +35,42 @@ def gsmrawkpiIndex():
     }
 
 
+def gsmrawkpiindex_daily():
+    return {
+        "DATE_ID": 0,
+        "CELL_NAME": 1,
+        "BSC": 2,
+        "Availability": 3,
+        "Interference_UL_ICM_Band4_Band5": 4,
+        "Call_Setup_Success_Rate": 5,
+        "SDCCH_Drop_Rate": 6,
+        "Call_Drop_Rate": 7,
+        "HO_Success_Rate": 8,
+        "HO_attempts": 9,
+        "HO_UTRAN_Success_Rate": 10,
+        "HO_Utran_Attempts": 11,
+        "HO_Utran_Success": 12,
+        "HO_Utran_Channel": 13,
+        "TbfDrop_Rate": 14,
+        "Voice_Traffic": 15,
+        "Traffic_Mb": 16,
+        "DL_EGRPS_Throughput": 17,
+        "UL_EGRPS_Throughput": 18,
+        "Random_Access_Success_Rate": 19,
+        "HO_Reversion": 20,
+        "SDCCH_Drop_Reason_Low_SS": 21,
+        "SDCCH_Drop_Reason_Quality": 22,
+        "SDCCH_Drop_Reason_Excessive_TA": 23,
+        "SDCCH_Drop_Reason_Other": 24,
+        "SDCCH_Congest": 25,
+        "TCH_Drop_Reason_Low_SS": 26,
+        "TCH_Drop_Reason_Bad_Quality": 27,
+        "TCH_Drop_Reason_Suddenly_Lost_Connection": 28,
+        "TCH_Drop_Reason_Excessive_TA": 29,
+        "TCH_Drop_Reason_Other": 30,
+    }
+
+
 def baseline():
     return [
         ("Availability", "99.9"),

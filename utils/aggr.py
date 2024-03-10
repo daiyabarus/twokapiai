@@ -9,12 +9,12 @@ class Aggr:
 
     @property
     def delta_percent(self):
-        if self.post == 0:
-            if self.pre != 0:
+        if self.pre == 0:
+            if self.post != 0:
                 return float("inf")
             else:
                 return 0
-        return abs(round((self.delta / self.post) * 100, 2))
+        return abs(round((self.delta / self.pre) * 100, 2))
 
     @property
     def flag(self):
@@ -60,3 +60,17 @@ class Aggr:
             return "Degrade"
         else:
             return "Maintain"
+
+    @property
+    def _flagtarget(self):
+        if self.post >= self.pre:
+            return "Pass"
+        else:
+            return "Fail"
+
+    @property
+    def _flagtargetdrop(self):
+        if self.post <= self.pre:
+            return "Pass"
+        else:
+            return "Fail"

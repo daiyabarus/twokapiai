@@ -11,7 +11,9 @@ import multiprocessing
 
 
 class MyKPIProcess:
-    def __init__(self, mockpi_list, cell_data, raw_data_csv, date_data, bh_data):
+    def __init__(
+        self, mockpi_list, cell_data, raw_data_csv, date_data, bh_data
+    ):
         self.mockpi_list = mockpi_list
         self.cell_data = cell_data
         self.raw_data_csv = raw_data_csv
@@ -49,7 +51,8 @@ class MyKPIProcess:
 def main():
     startTime = time.time()
     print(
-        "StartTime: ", datetime.fromtimestamp(startTime).strftime("%Y-%m-%d %H:%M:%S")
+        "StartTime: ",
+        datetime.fromtimestamp(startTime).strftime("%Y-%m-%d %H:%M:%S"),
     )
 
     project_dir = os.path.dirname(os.path.abspath(__file__))
@@ -88,11 +91,16 @@ def main():
     pool.close()
     pool.join()
 
-    kpi_process_result = [result for sublist in kpi_results for result in sublist]
+    kpi_process_result = [
+        result for sublist in kpi_results for result in sublist
+    ]
 
     print(kpi_process_result)
     endTime = time.time()
-    print("endTime: ", datetime.fromtimestamp(endTime).strftime("%Y-%m-%d %H:%M:%S"))
+    print(
+        "endTime: ",
+        datetime.fromtimestamp(endTime).strftime("%Y-%m-%d %H:%M:%S"),
+    )
 
     elapsedTime = endTime - startTime
 

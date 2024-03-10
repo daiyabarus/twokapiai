@@ -38,7 +38,11 @@ MANIFEST
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
-
+/sampah/*
+sampah
+sampah/
+test.py
+kpiprocess.py
 # Unit test / coverage reports
 /input
 htmlcov/
