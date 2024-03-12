@@ -118,9 +118,9 @@ class AGGNodePrePost:
 
             prepost_calc = Diff(pre_avg, post_avg)
 
-            # flag_result_prepost = (
-            #     prepost_calc.flag5_inc if flag_type == "inc" else prepost_calc.flag5_dcr
-            # )
+            flag_result_prepost = (
+                prepost_calc.flag5_inc if flag_type == "inc" else prepost_calc.flag5_dcr
+            )
 
             one_day_calc = Diff(pre_avg_oneday[bsc], post_avg_oneday[bsc])
 

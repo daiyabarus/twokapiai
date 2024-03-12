@@ -8,14 +8,16 @@ from openpyxl.styles import Alignment
 from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
 
-redFill = PatternFill(
-    start_color="FFFFC7CE", end_color="FFFFC7CE", fill_type="solid"
-)
+redFill = PatternFill(start_color="FFFFC7CE", end_color="FFFFC7CE", fill_type="solid")
 darkRedText = Font(color="FF9C0006")
-greenFill = PatternFill(
-    start_color="FFC6EFCE", end_color="FFC6EFCE", fill_type="solid"
-)
+
+greenFill = PatternFill(start_color="FFC6EFCE", end_color="FFC6EFCE", fill_type="solid")
 darkGreenText = Font(color="FF006100")
+
+yellowFill = PatternFill(
+    start_color="FFFFEB9C", end_color="FFFFEB9C", fill_type="solid"
+)
+darkYellowText = Font(color="FF9C6500")
 
 headerFill = PatternFill("solid", fgColor="47402D")
 headerfont = Font(bold=True, color="FFFEFB")
@@ -156,25 +158,17 @@ class PrintToFile:
 
         for row_index, items in enumerate(unique_contents, start=2):
             for col_index, item in enumerate(items, start=1):
-                cell = ws_target.cell(
-                    row=row_index, column=col_index, value=item
-                )
-                if list_of_red and any(
-                    ext in str(item) for ext in list_of_red
-                ):
+                cell = ws_target.cell(row=row_index, column=col_index, value=item)
+                if list_of_red and any(ext in str(item) for ext in list_of_red):
                     cell.fill = redFill
                     cell.font = Font(name="Calibri", size=10, color="FF9C0006")
-                elif list_of_green and any(
-                    ext in str(item) for ext in list_of_green
-                ):
+                elif list_of_green and any(ext in str(item) for ext in list_of_green):
                     cell.fill = greenFill
                     cell.font = Font(name="Calibri", size=10, color="FF006100")
                 else:
                     cell.font = Font(name="Calibri", size=10)
                 cell.border = thin_border
-        ws_target.auto_filter.ref = (
-            f"A1:{get_column_letter(len(list_of_header))}1"
-        )
+        ws_target.auto_filter.ref = f"A1:{get_column_letter(len(list_of_header))}1"
         wb.save(file_to_save)
 
         return os.path.exists(file_to_save)
@@ -257,11 +251,6 @@ class PrintToFile:
             # starting row
             starting_row = 2
 
-            # header
-            # for index, header in enumerate(list_of_header):
-            #     col = index + 1 + col_offside
-            #     ws_target.cell(row=starting_row, column=col).value = header
-
             starting_row += 1
             for items in list_of_contents:
                 for col, item in enumerate(items):
@@ -279,9 +268,7 @@ class PrintToFile:
 
                     ws_target.cell(
                         row=starting_row, column=col + 1 + col_offside
-                    ).alignment = Alignment(
-                        horizontal="center", vertical="center"
-                    )
+                    ).alignment = Alignment(horizontal="center", vertical="center")
 
                     ws_target.cell(
                         row=starting_row, column=col + 1 + col_offside
@@ -296,4 +283,123 @@ class PrintToFile:
         except Exception:
             errors = traceback.format_exc()
             print(errors)
+            return False
+
+    @staticmethod
+    def to_xlsx_offside_noheader_fullcolor(
+        file_to_save: str,
+        ws_name: str,
+        list_of_contents: list,
+        list_of_red: list = [],
+        list_of_green: list = [],
+        list_of_yellow: list = [],
+        col_offside: int = 0,
+    ):
+        try:
+            # Check if workbook exists
+            if os.path.exists(file_to_save):
+                wb = load_workbook(file_to_save)
+            else:
+                wb = Workbook()
+                wb.remove(wb["Sheet"])
+
+            # Create sheet
+            if ws_name in wb.sheetnames:
+                ws_target = wb[ws_name]
+            else:
+                ws_target = wb.create_sheet(ws_name)
+
+            # Starting row
+            starting_row = 4
+
+            starting_row += 1
+            for items in list_of_contents:
+                for col, item in enumerate(items):
+                    cell = ws_target.cell(
+                        row=starting_row, column=col + 1 + col_offside
+                    )
+                    cell.value = item
+
+                    # Apply formatting based on category
+                    if item in list_of_red:
+                        cell.fill = redFill
+                        cell.font = darkRedText
+                    elif item in list_of_green:
+                        cell.fill = greenFill
+                        cell.font = darkGreenText
+                    elif item in list_of_yellow:
+                        cell.fill = yellowFill
+                        cell.font = darkYellowText
+                    else:
+                        # Default cell formatting
+                        cell.font = Font(name="Calibri", size=10)
+
+                    cell.border = thin_border
+                    cell.alignment = Alignment(horizontal="center", vertical="center")
+
+                starting_row += 1
+
+            wb.save(file_to_save)
+
+            return True
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return False
+
+    @staticmethod
+    def to_xlsx_offside_noheader_color(
+        file_to_save: str,
+        ws_name: str,
+        list_of_contents: list,
+        list_of_red: list = [],
+        list_of_green: list = [],
+        list_of_yellow: list = [],
+        col_offside: int = 0,
+        starting_row: int = 1,
+    ):
+        try:
+            # Check if workbook exists
+            if os.path.exists(file_to_save):
+                wb = load_workbook(file_to_save)
+            else:
+                wb = Workbook()
+                wb.remove(wb["Sheet"])
+
+            # Create sheet
+            if ws_name in wb.sheetnames:
+                ws_target = wb[ws_name]
+            else:
+                ws_target = wb.create_sheet(ws_name)
+
+            for items in list_of_contents:
+                for col, item in enumerate(items):
+                    cell = ws_target.cell(
+                        row=starting_row, column=col + 1 + col_offside
+                    )
+                    cell.value = item
+
+                    # Apply formatting based on category
+                    if item in list_of_red:
+                        cell.fill = redFill
+                        cell.font = darkRedText
+                    elif item in list_of_green:
+                        cell.fill = greenFill
+                        cell.font = darkGreenText
+                    elif item in list_of_yellow:
+                        cell.fill = yellowFill
+                        cell.font = darkYellowText
+                    else:
+                        # Default cell formatting
+                        cell.font = Font(name="Calibri", size=10)
+
+                    cell.border = thin_border
+                    cell.alignment = Alignment(horizontal="center", vertical="center")
+
+                starting_row += 1
+
+            wb.save(file_to_save)
+
+            return True
+        except Exception as e:
+            print(f"An error occurred: {e}")
             return False

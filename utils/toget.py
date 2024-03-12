@@ -30,6 +30,12 @@ class ToGet:
         pass
 
     @staticmethod
+    def get_current_week() -> str:
+        """Get the current week number"""
+        now = datetime.datetime.now()
+        return str(now.isocalendar()[1])
+
+    @staticmethod
     def get_current_datetime() -> str:
         """Get current Date and Time YYYYMMDD_HHMMSS"""
         now = datetime.datetime.now()

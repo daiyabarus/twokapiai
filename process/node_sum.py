@@ -94,53 +94,47 @@ class SUMNodePrePost:
             pre_sum = sum(pre_values.get(bsc, []))
             post_sum = sum(post_values.get(bsc, []))
 
-            if self.mockpi in inc_kpis:
-                flag_type = "inc"
-            elif self.mockpi in dcr_kpis:
-                flag_type = "dcr"
-            else:
-                flag_type = "unknown"
+            # if self.mockpi in inc_kpis:
+            #     flag_type = "inc"
+            # elif self.mockpi in dcr_kpis:
+            #     flag_type = "dcr"
+            # else:
+            #     flag_type = "unknown"
 
             prepost_calc = Diff(pre_sum, post_sum)
-            flag_result_prepost = (
-                prepost_calc.flag5_inc if flag_type == "inc" else prepost_calc.flag5_dcr
-            )
+            # flag_result_prepost = (
+            #     prepost_calc.flag5_inc if flag_type == "inc" else prepost_calc.flag5_dcr
+            # )
 
             one_day_calc = Diff(pre_sum_oneday.get(bsc, 0), post_sum_oneday.get(bsc, 0))
-            flag_result_one_day = (
-                one_day_calc.flag5_inc if flag_type == "inc" else one_day_calc.flag5_dcr
-            )
-
+            # flag_result_one_day = (
+            #     one_day_calc.flag5_inc if flag_type == "inc" else one_day_calc.flag5_dcr
+            # )
+            #
             twodays_calc = Diff(
                 pre_sum_twodays.get(bsc, 0), post_sum_twodays.get(bsc, 0)
             )
-            flag_result_two_days = (
-                twodays_calc.flag5_inc if flag_type == "inc" else twodays_calc.flag5_dcr
-            )
+            # flag_result_two_days = (
+            #     twodays_calc.flag5_inc if flag_type == "inc" else twodays_calc.flag5_dcr
+            # )
 
             oneweek_calc = Diff(
                 pre_sum_oneweek.get(bsc, 0), post_sum_oneweek.get(bsc, 0)
             )
-            flag_result_one_week = (
-                oneweek_calc.flag5_inc if flag_type == "inc" else oneweek_calc.flag5_dcr
-            )
+            # flag_result_one_week = (
+            #     oneweek_calc.flag5_inc if flag_type == "inc" else oneweek_calc.flag5_dcr
+            # )
 
             if baseline_dict.get(self.mockpi) == "SUFFIX":
                 post_baseline = post_sum_oneweek.get(bsc, 0)
                 pre_baseline = pre_sum_oneweek.get(bsc, 0)
-            elif self.mockpi in dcr_kpis:
-                pre_baseline = post_sum_oneweek.get(bsc, 0)
-                post_baseline = float(baseline_dict.get(self.mockpi, 0))
+                baseline_calc = Diff(pre_baseline, post_baseline)
+                baseline_flag = baseline_calc.threshold_flag_dec
             else:
                 pre_baseline = post_sum_oneweek.get(bsc, 0)
                 post_baseline = float(baseline_dict.get(self.mockpi, 0))
-
-            baseline_calc = Diff(pre_baseline, post_baseline)
-            baseline_flag = (
-                baseline_calc.threshold_flag_inc
-                if self.mockpi in inc_kpis
-                else baseline_calc.threshold_flag_dec
-            )
+                baseline_calc = Diff(pre_baseline, post_baseline)
+                baseline_flag = baseline_calc.threshold_flag_inc
 
             kpi_data = [
                 bsc,
@@ -154,17 +148,17 @@ class SUMNodePrePost:
                 post_sum_oneday.get(bsc, 0),
                 one_day_calc.delta,
                 one_day_calc.delta_percent,
-                flag_result_one_day,
+                one_day_calc.flag5_inc,
                 pre_sum_twodays.get(bsc, 0),
                 post_sum_twodays.get(bsc, 0),
                 twodays_calc.delta,
                 twodays_calc.delta_percent,
-                flag_result_two_days,
+                twodays_calc.flag5_inc,
                 pre_sum_oneweek.get(bsc, 0),
                 post_sum_oneweek.get(bsc, 0),
                 oneweek_calc.delta,
                 oneweek_calc.delta_percent,
-                flag_result_one_week,
+                oneweek_calc.flag5_inc,
                 pre_baseline,
                 post_baseline,
                 baseline_flag,
@@ -172,4 +166,3 @@ class SUMNodePrePost:
 
             kpi_result.append(kpi_data)
         return kpi_result
-
