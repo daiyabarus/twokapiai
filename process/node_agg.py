@@ -3,10 +3,9 @@ from datetime import datetime, timedelta
 from eenum.enumflag import Flag
 
 
-class AGGPrePost:
+class AGGNodePrePost:
     def __init__(
         self,
-        cell_data,
         rawhourly_data,
         rawhourly_col,
         rawdaily_data,
@@ -16,7 +15,6 @@ class AGGPrePost:
         baseline_data,
         mockpi,
     ):
-        self.cell_data = cell_data
         self.rawhourly_data = rawhourly_data
         self.rawhourly_col = rawhourly_col
         self.rawdaily_data = rawdaily_data
@@ -29,86 +27,67 @@ class AGGPrePost:
     def _parse_date(self, date_str):
         return datetime.strptime(date_str, "%m/%d/%Y").date()
 
-    def _get_bsc(self, cell_name):
-        for raw_data in self.rawdaily_data[1:]:
-            if raw_data[self.rawdaily_col.get("CELL_NAME", 1)] == cell_name:
-                return raw_data[self.rawdaily_col.get("BSC", 2)]
-        return "UNDEFINED"
-
     def _extract_kpi_values(self, include_busy_hour=True):
-        pre_values = {cell: [] for cell in self.cell_data}
-        post_values = {cell: [] for cell in self.cell_data}
-
         pre_date = self._parse_date(self.date_data[0][0])
         post_date = self._parse_date(self.date_data[0][1])
+        pre_values = {}
+        post_values = {}
 
         for raw_data in self.rawhourly_data[1:]:
-            cell, date_str, hour = [
-                raw_data[self.rawhourly_col.get(key, idx)]
-                for key, idx in [
-                    ("CELL_NAME", 2),
-                    ("DATE_ID", 0),
-                    ("HOUR_ID", 1),
-                ]
+            bsc, date_str, hour = [
+                raw_data[self.rawhourly_col[key]]
+                for key in ["BSC", "DATE_ID", "HOUR_ID"]
             ]
             date = self._parse_date(date_str)
-
-            if cell in self.cell_data:
-                if include_busy_hour or int(hour) not in self.busyhour_data:
-                    kpi_str = raw_data[self.rawhourly_col.get(self.mockpi, None)]
-                    kpi_value = float(kpi_str) if kpi_str else 0
-
-                    if date == pre_date:
-                        pre_values[cell].append(kpi_value)
-                    elif date == post_date:
-                        post_values[cell].append(kpi_value)
+            if not include_busy_hour or int(hour) in self.busyhour_data:
+                # Now correctly includes data if within busy hours
+                kpi_str = raw_data[self.rawhourly_col.get(self.mockpi, None)]
+                kpi_value = float(kpi_str) if kpi_str else 0
+                if date == pre_date:
+                    pre_values.setdefault(bsc, []).append(kpi_value)
+                elif date == post_date:
+                    post_values.setdefault(bsc, []).append(kpi_value)
 
         return pre_values, post_values
 
     def _average_kpi_values_for_dates(self, values, start_date, end_date):
-        avg_values = {cell: [] for cell in self.cell_data}
+        avg_values = {}
         for raw_data in self.rawdaily_data[1:]:
-            cell, date_str, _ = [
-                raw_data[self.rawdaily_col.get(key, idx)]
-                for key, idx in [("CELL_NAME", 1), ("DATE_ID", 0), ("BSC", 2)]
+            bsc, date_str = [
+                raw_data[self.rawdaily_col[key]] for key in ["BSC", "DATE_ID"]
             ]
             date = self._parse_date(date_str)
 
-            if cell in self.cell_data and start_date <= date <= end_date:
+            if start_date <= date <= end_date:
                 kpi_str = raw_data[self.rawdaily_col.get(self.mockpi, None)]
                 kpi_value = float(kpi_str) if kpi_str else 0
-                avg_values[cell].append(kpi_value)
+
+                avg_values.setdefault(bsc, []).append(kpi_value)
 
         return {
-            cell: round(sum(vals) / len(vals), 2) if vals else 0
-            for cell, vals in avg_values.items()
+            bsc: round(sum(vals) / len(vals), 2) if vals else 0
+            for bsc, vals in avg_values.items()
         }
 
     def process_kpi(self):
-        kpi_result = []
-        baseline_dict = dict(self.baseline_data)
         pre_date = self._parse_date(self.date_data[0][0])
         post_date = self._parse_date(self.date_data[0][1])
+        baseline_dict = dict(self.baseline_data)
         inc_kpis = Flag.flag5_inc()
         dcr_kpis = Flag.flag5_dcr()
-
         pre_values, post_values = self._extract_kpi_values(False)
-
         pre_avg_oneday = self._average_kpi_values_for_dates(
             pre_values, pre_date, pre_date
         )
-
         post_avg_oneday = self._average_kpi_values_for_dates(
             post_values, post_date, post_date
         )
-
         pre_avg_twodays = self._average_kpi_values_for_dates(
             pre_values, pre_date, pre_date + timedelta(days=1)
         )
         post_avg_twodays = self._average_kpi_values_for_dates(
             post_values, post_date - timedelta(days=1), post_date
         )
-
         pre_avg_oneweek = self._average_kpi_values_for_dates(
             pre_values, pre_date, pre_date + timedelta(days=6)
         )
@@ -116,15 +95,17 @@ class AGGPrePost:
             post_values, post_date - timedelta(days=6), post_date
         )
 
-        for cell in self.cell_data:
+        kpi_result = []
+
+        for bsc in set(list(pre_avg_oneday.keys()) + list(post_avg_oneday.keys())):
             pre_avg = (
-                round(sum(pre_values[cell]) / len(pre_values[cell]), 2)
-                if pre_values[cell]
+                round(sum(pre_values.get(bsc, [])) / len(pre_values.get(bsc, [])), 2)
+                if pre_values.get(bsc)
                 else 0
             )
             post_avg = (
-                round(sum(post_values[cell]) / len(post_values[cell]), 2)
-                if post_values[cell]
+                round(sum(post_values.get(bsc, [])) / len(post_values.get(bsc, [])), 2)
+                if post_values.get(bsc)
                 else 0
             )
 
@@ -135,69 +116,67 @@ class AGGPrePost:
             else:
                 flag_type = "unknown"
 
-            bsc = self._get_bsc(cell)
             prepost_calc = Diff(pre_avg, post_avg)
 
-            flag_result_prepost = (
-                prepost_calc.flag5_inc if flag_type == "inc" else prepost_calc.flag5_dcr
-            )
+            # flag_result_prepost = (
+            #     prepost_calc.flag5_inc if flag_type == "inc" else prepost_calc.flag5_dcr
+            # )
 
-            one_day_calc = Diff(pre_avg_oneday[cell], post_avg_oneday[cell])
+            one_day_calc = Diff(pre_avg_oneday[bsc], post_avg_oneday[bsc])
 
             flag_result_one_day = (
                 one_day_calc.flag5_inc if flag_type == "inc" else one_day_calc.flag5_dcr
             )
 
-            twodays_calc = Diff(pre_avg_twodays[cell], post_avg_twodays[cell])
+            twodays_calc = Diff(pre_avg_twodays[bsc], post_avg_twodays[bsc])
 
             flag_result_two_days = (
                 twodays_calc.flag5_inc if flag_type == "inc" else twodays_calc.flag5_dcr
             )
 
-            oneweek_calc = Diff(pre_avg_oneweek[cell], post_avg_oneweek[cell])
+            oneweek_calc = Diff(pre_avg_oneweek[bsc], post_avg_oneweek[bsc])
             flag_result_one_week = (
                 oneweek_calc.flag5_inc if flag_type == "inc" else oneweek_calc.flag5_dcr
             )
 
             if baseline_dict.get(self.mockpi) == "SUFFIX":
-                post_baseline = post_avg_oneweek[cell]
-                pre_baseline = pre_avg_oneweek[cell]
+                post_baseline = post_avg_oneweek[bsc]
+                pre_baseline = pre_avg_oneweek[bsc]
                 baseline_calc = Diff(pre_baseline, post_baseline)
                 baseline_flag = baseline_calc.threshold_flag_dec
 
             elif self.mockpi in dcr_kpis:
-                pre_baseline = post_avg_oneweek[cell]
+                pre_baseline = post_avg_oneweek[bsc]
                 post_baseline = float(baseline_dict.get(self.mockpi, 0))
                 baseline_calc = Diff(pre_baseline, post_baseline)
                 baseline_flag = baseline_calc.threshold_flag_dec
 
             else:
-                pre_baseline = post_avg_oneweek[cell]
+                pre_baseline = post_avg_oneweek[bsc]
                 post_baseline = float(baseline_dict.get(self.mockpi, 0))
                 baseline_calc = Diff(pre_baseline, post_baseline)
                 baseline_flag = baseline_calc.threshold_flag_inc
 
             kpi_data = [
                 bsc,
-                cell,
                 self.mockpi,
-                pre_avg,
-                post_avg,
-                prepost_calc.delta,
-                prepost_calc.delta_percent,
-                flag_result_prepost,
-                pre_avg_oneday[cell],
-                post_avg_oneday[cell],
+                # pre_avg,
+                # post_avg,
+                # prepost_calc.delta,
+                # prepost_calc.delta_percent,
+                # flag_result_prepost,
+                pre_avg_oneday[bsc],
+                post_avg_oneday[bsc],
                 one_day_calc.delta,
                 one_day_calc.delta_percent,
                 flag_result_one_day,
-                pre_avg_twodays[cell],
-                post_avg_twodays[cell],
+                pre_avg_twodays[bsc],
+                post_avg_twodays[bsc],
                 twodays_calc.delta,
                 twodays_calc.delta_percent,
                 flag_result_two_days,
-                pre_avg_oneweek[cell],
-                post_avg_oneweek[cell],
+                pre_avg_oneweek[bsc],
+                post_avg_oneweek[bsc],
                 oneweek_calc.delta,
                 oneweek_calc.delta_percent,
                 flag_result_one_week,
@@ -205,6 +184,6 @@ class AGGPrePost:
                 post_baseline,
                 baseline_flag,
             ]
-            kpi_result.append(kpi_data)
 
+            kpi_result.append(kpi_data)
         return kpi_result

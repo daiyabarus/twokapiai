@@ -1,11 +1,13 @@
 from process.cell_agg import AGGPrePost
 from process.cell_sum import SUMPrePost
+from process.node_agg import AGGNodePrePost
+from process.node_sum import SUMNodePrePost
 
 from utils.toget import ToGet
 from datetime import datetime
-from enumflag import Flag
+from eenum.enumflag import Flag
 
-import enumlist
+from eenum.enumlist import gsmrawkpiIndex, gsmrawkpiindex_daily, baseline
 
 import time
 import os
@@ -25,6 +27,8 @@ def main():
     kpidaily = ToGet.get_listfile_with_prefix(source_kpi, "DAILY")
 
     kpi_process_result = []
+    kpi_node_result = []
+
     hourly_raw = [os.path.join(source_kpi, filename) for filename in kpihourly]
     daily_raw = [os.path.join(source_kpi, filename) for filename in kpidaily]
 
@@ -45,38 +49,70 @@ def main():
         aggprepost_compare = AGGPrePost(
             cell_data=cell_data,
             rawhourly_data=rawhourly_data,
-            rawhourly_col=enumlist.gsmrawkpiIndex(),
+            rawhourly_col=gsmrawkpiIndex(),
             rawdaily_data=rawdaily_data,
-            rawdaily_col=enumlist.gsmrawkpiindex_daily(),
+            rawdaily_col=gsmrawkpiindex_daily(),
             date_data=date_data,
             busyhour_data=bh_data,
-            baseline_data=enumlist.baseline(),
+            baseline_data=baseline(),
             mockpi=mockpi,
         )
 
-        kpi_result_avail = aggprepost_compare.process_kpi()
-        kpi_process_result.extend(kpi_result_avail)
+        kpi_result = aggprepost_compare.process_kpi()
+        kpi_process_result.extend(kpi_result)
 
     for mockpi in mockpi_sum_list:
         sumprepost_compare = SUMPrePost(
             cell_data=cell_data,
             rawhourly_data=rawhourly_data,
-            rawhourly_col=enumlist.gsmrawkpiIndex(),
+            rawhourly_col=gsmrawkpiIndex(),
             rawdaily_data=rawdaily_data,
-            rawdaily_col=enumlist.gsmrawkpiindex_daily(),
+            rawdaily_col=gsmrawkpiindex_daily(),
             date_data=date_data,
             busyhour_data=bh_data,
-            baseline_data=enumlist.baseline(),
+            baseline_data=baseline(),
             mockpi=mockpi,
         )
 
-        kpi_result_avail = sumprepost_compare.process_kpi()
-        kpi_process_result.extend(kpi_result_avail)
+        kpi_result = sumprepost_compare.process_kpi()
+        kpi_process_result.extend(kpi_result)
+
+    for mockpi in mockpi_agg_list:
+        aggprepost_node_compare = AGGNodePrePost(
+            rawhourly_data=rawhourly_data,
+            rawhourly_col=gsmrawkpiIndex(),
+            rawdaily_data=rawdaily_data,
+            rawdaily_col=gsmrawkpiindex_daily(),
+            date_data=date_data,
+            busyhour_data=bh_data,
+            baseline_data=baseline(),
+            mockpi=mockpi,
+        )
+
+        kpi_result = aggprepost_node_compare.process_kpi()
+        kpi_node_result.extend(kpi_result)
+
+    for mockpi in mockpi_sum_list:
+        sumprepost_node_compare = SUMNodePrePost(
+            rawhourly_data=rawhourly_data,
+            rawhourly_col=gsmrawkpiIndex(),
+            rawdaily_data=rawdaily_data,
+            rawdaily_col=gsmrawkpiindex_daily(),
+            date_data=date_data,
+            busyhour_data=bh_data,
+            baseline_data=baseline(),
+            mockpi=mockpi,
+        )
+
+        kpi_result = sumprepost_node_compare.process_kpi()
+        kpi_node_result.extend(kpi_result)
 
     print(kpi_process_result)
+    print(kpi_node_result)
+
     endTime = time.time()
     print(
-        "endTime: ",
+        "EndTime: ",
         datetime.fromtimestamp(endTime).strftime("%Y-%m-%d %H:%M:%S"),
     )
 
@@ -91,3 +127,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
