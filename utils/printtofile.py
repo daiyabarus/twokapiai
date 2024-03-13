@@ -9,15 +9,15 @@ from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
 
 redFill = PatternFill(start_color="FFFFC7CE", end_color="FFFFC7CE", fill_type="solid")
-darkRedText = Font(color="FF9C0006")
+darkRedText = Font(color="FF9C0006", name="Calibri", size=10)
 
 greenFill = PatternFill(start_color="FFC6EFCE", end_color="FFC6EFCE", fill_type="solid")
-darkGreenText = Font(color="FF006100")
+darkGreenText = Font(color="FF006100", name="Calibri", size=10)
 
 yellowFill = PatternFill(
     start_color="FFFFEB9C", end_color="FFFFEB9C", fill_type="solid"
 )
-darkYellowText = Font(color="FF9C6500")
+darkYellowText = Font(color="FF9C6500", name="Calibri", size=10)
 
 headerFill = PatternFill("solid", fgColor="47402D")
 headerfont = Font(bold=True, color="FFFEFB")
@@ -39,10 +39,8 @@ class PrintToFile:
         with open(file_to_save, "w", encoding="UTF8", newline="") as f:
             writer = csv.writer(f)
 
-            # write the header
             writer.writerow(csv_header)
 
-            # write the data
             for item in list_of_mo:
                 writer.writerow(item)
 
@@ -324,12 +322,15 @@ class PrintToFile:
                     if item in list_of_red:
                         cell.fill = redFill
                         cell.font = darkRedText
+
                     elif item in list_of_green:
                         cell.fill = greenFill
                         cell.font = darkGreenText
+
                     elif item in list_of_yellow:
                         cell.fill = yellowFill
                         cell.font = darkYellowText
+
                     else:
                         # Default cell formatting
                         cell.font = Font(name="Calibri", size=10)
@@ -382,12 +383,17 @@ class PrintToFile:
                     if item in list_of_red:
                         cell.fill = redFill
                         cell.font = darkRedText
+
                     elif item in list_of_green:
                         cell.fill = greenFill
+
                         cell.font = darkGreenText
+                        # cell.font = Font(name="Calibri", size=10)
                     elif item in list_of_yellow:
                         cell.fill = yellowFill
+
                         cell.font = darkYellowText
+                        # cell.font = Font(name="Calibri", size=10)
                     else:
                         # Default cell formatting
                         cell.font = Font(name="Calibri", size=10)

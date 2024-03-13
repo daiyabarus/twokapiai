@@ -98,9 +98,9 @@ class ProcessKPI:
                 file_to_save=self.final_path,
                 ws_name=self.sheet_naming.cell,
                 list_of_contents=kpi_process_result,
-                list_of_red=["FAIL", "Degrade"],
+                list_of_red=["Fail", "Degrade"],
                 list_of_yellow=["Maintain"],
-                list_of_green=["Improve", "PASS"],
+                list_of_green=["Improve", "Pass"],
                 col_offside=0,
                 starting_row=5,
             )
@@ -170,9 +170,9 @@ class ProcessKPI:
                 file_to_save=self.final_path,
                 ws_name=self.sheet_naming.node,
                 list_of_contents=kpi_node_result,
-                list_of_red=["FAIL", "Degrade"],
+                list_of_red=["Fail", "Degrade"],
                 list_of_yellow=["Maintain"],
-                list_of_green=["Improve", "PASS"],
+                list_of_green=["Improve", "Pass"],
                 col_offside=0,
                 starting_row=5,
             )
@@ -189,8 +189,12 @@ class ProcessKPI:
             ori_path = "templates/TEMPLATE.xlsx"
             final_folder = "output_result"
             datetime_today = ToGet.get_current_datetime()
-            weeknum = ToGet.get_current_week()
-            final_filenaming = f"GSM_W{weeknum}_KPI_{datetime_today}.xlsx"
+            week = ToGet.get_current_week()
+            weeknum = int(week) - 1
+            weeknum2 = int(weeknum - 1)
+            final_filenaming = (
+                f"KPI_W{weeknum2}_to_W{weeknum}_GSM_{datetime_today}.xlsx"
+            )
             final_path = os.path.join(final_folder, final_filenaming)
 
             shutil.copyfile(ori_path, final_path)

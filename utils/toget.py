@@ -33,7 +33,7 @@ class ToGet:
     def get_current_week() -> str:
         """Get the current week number"""
         now = datetime.datetime.now()
-        return str(now.isocalendar()[1])
+        return float(now.isocalendar()[1])
 
     @staticmethod
     def get_current_datetime() -> str:

@@ -22,9 +22,9 @@ class Diff:
         Delta%>= 5 Delta > 0 Improve, ' Delta%>= 5 Delta < 0 Degrade, Maintain
         APPLY FOR KPI LIKE SUCCESS RATE
         """
-        if self.delta > 0 and self.delta_percent >= 5:
+        if self.delta > 0 and self.delta_percent >= 10:
             return "Improve"
-        elif self.delta < 0 and self.delta_percent >= 5:
+        elif self.delta < 0 and self.delta_percent >= 10:
             return "Degrade"
         else:
             return "Maintain"
@@ -35,9 +35,9 @@ class Diff:
         Delta%>= 5 Delta < 0 Improve, ' Delta% >= 5 Delta > 0 Degrade, Maintain
         APPLY FOR KPI LIKE DROP
         """
-        if self.delta < 0 and self.delta_percent >= 5:
+        if self.delta < 0 and self.delta_percent >= 10:
             return "Improve"
-        elif self.delta > 0 and self.delta_percent >= 5:
+        elif self.delta > 0 and self.delta_percent >= 10:
             return "Degrade"
         else:
             return "Maintain"
@@ -50,9 +50,9 @@ class Diff:
         post is Baseline
         """
         if self.post <= self.pre:
-            return "PASS"
+            return "Pass"
         else:
-            return "FAIL"
+            return "Fail"
 
     @property
     def threshold_flag_dec(self):
@@ -62,6 +62,6 @@ class Diff:
         pre is Baseline
         """
         if self.post >= self.pre:
-            return "PASS"
+            return "Pass"
         else:
-            return "FAIL"
+            return "Fail"
