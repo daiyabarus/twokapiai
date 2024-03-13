@@ -321,12 +321,8 @@ AND AA.BSC = AF.BSC
 
 WHERE
 AA.DATE_ID BETWEEN today()-2 AND today()-16 AND (
-AA.BSC like 'VA1BSC1' or
-AA.BSC like 'TO3BSC1' or
-AA.BSC like 'CA1BSC1' or 
-AA.BSC like 'TO5BSC1' or
-AA.BSC like 'ML2BSC1' or
-AA.BSC like 'HA1BSC1'
+AA.BSC like 'BSC1' or
+AA.BSC like '1BSC1'
 )
 
 ORDER BY AA.DATE_ID, AA.BSC, AA.CELL_NAME;
