@@ -1,6 +1,6 @@
 from utils.diff import Diff
 from datetime import datetime, timedelta
-from eenum.enumflag import Flag
+# from eenum.enumflag import Flag
 
 
 class SUMNodePrePost:
@@ -68,8 +68,8 @@ class SUMNodePrePost:
         pre_date = self._parse_date(self.date_data[0][0])
         post_date = self._parse_date(self.date_data[0][1])
         baseline_dict = dict(self.baseline_data)
-        inc_kpis = Flag.flag5_inc()
-        dcr_kpis = Flag.flag5_dcr()
+        # inc_kpis = Flag.flag5_inc()
+        # dcr_kpis = Flag.flag5_dcr()
         pre_values, post_values = self._extract_kpi_values(False)
         pre_sum_oneday = self._sum_kpi_values_for_dates(pre_values, pre_date, pre_date)
         post_sum_oneday = self._sum_kpi_values_for_dates(
@@ -130,11 +130,13 @@ class SUMNodePrePost:
                 pre_baseline = pre_sum_oneweek.get(bsc, 0)
                 baseline_calc = Diff(pre_baseline, post_baseline)
                 baseline_flag = baseline_calc.threshold_flag_dec
+                baseline_delta = baseline_calc.delta_percent
             else:
                 pre_baseline = post_sum_oneweek.get(bsc, 0)
                 post_baseline = float(baseline_dict.get(self.mockpi, 0))
                 baseline_calc = Diff(pre_baseline, post_baseline)
                 baseline_flag = baseline_calc.threshold_flag_inc
+                baseline_delta = baseline_calc.delta_percent
 
             kpi_data = [
                 bsc,
@@ -161,6 +163,7 @@ class SUMNodePrePost:
                 oneweek_calc.flag5_inc,
                 pre_baseline,
                 post_baseline,
+                baseline_delta,
                 baseline_flag,
             ]
 
